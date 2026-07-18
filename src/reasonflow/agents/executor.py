@@ -31,11 +31,19 @@ class Executor:
             elif step.tool_call.action == "discover":
                 manifests = tool.find_manifests(repository)
 
-                if manifests:
-                    for manifest in manifests:
-                        memory.add(f"Found manifest: {manifest}")
-
-                else:
+                if not manifests:
                     memory.add("No dependency manifests found.")
+                    continue
+
+                for manifest in manifests:
+                    memory.add(f"Found manifest: {manifest}")
+
+                    dependencies = tool.read_dependencies(
+                        repository,
+                        manifest,
+                    )
+
+                    for dependency in dependencies:
+                        memory.add(f"Dependency: {dependency}")
 
         return repository
