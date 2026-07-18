@@ -1,9 +1,11 @@
+from reasonflow.agents.executor import Executor
 from reasonflow.agents.planner import PlanningAgent
 from reasonflow.models.goal import Goal
 from reasonflow.models.repository import Repository
 from reasonflow.services.github import GitHubClient
 from reasonflow.services.llm.fake import FakeLLM
 from reasonflow.tools.github import GitHubTool
+from reasonflow.tools.registry import ToolRegistry
 
 
 class RepositoryAnalysisWorkflow:
@@ -23,16 +25,24 @@ class RepositoryAnalysisWorkflow:
         planner = PlanningAgent(FakeLLM())
         plan = planner.create_plan(goal)
 
-        # print(plan)
         print("\nPlanning...\n")
 
         for step in plan.steps:
             print(f"✓ {step.description}")
 
-        github_tool = GitHubTool(GitHubClient())
-        repository = github_tool.enrich(repository)
+        registry = ToolRegistry()
+        registry.register(
+            "github",
+            GitHubTool(GitHubClient()),
+        )
 
-        # print(repository)
+        executor = Executor(registry)
+
+        repository = executor.execute(
+            plan,
+            repository,
+        )
+
         print("\nRepository Information")
         print("-" * 30)
         print(f"Owner           : {repository.owner}")
