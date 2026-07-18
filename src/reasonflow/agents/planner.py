@@ -4,6 +4,8 @@ from reasonflow.services.llm.base import BaseLLM
 
 
 class PlanningAgent:
+    """Agent that creates a plan to achieve a goal using an LLM."""
+
     def __init__(self, llm: BaseLLM):
         self.llm = llm
 

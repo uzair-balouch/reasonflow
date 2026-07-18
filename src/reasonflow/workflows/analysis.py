@@ -1,22 +1,35 @@
-from reasonflow.agents.planner import PlannerAgent
+from reasonflow.agents.planner import PlanningAgent
+from reasonflow.models.goal import Goal
 from reasonflow.models.repository import Repository
+from reasonflow.services.github import GitHubClient
+from reasonflow.services.llm.fake import FakeLLM
 from reasonflow.tools.github import GitHubTool
 
 
 class RepositoryAnalysisWorkflow:
-    """
-    Orchestrates repository analysis.
-    """
+    def run(
+        self,
+        goal: Goal,
+        repository: Repository,
+    ) -> Repository:
+        goal = Goal(
+            description="Analyze this repository",
+        )
 
-    def run(self, repository: Repository) -> None:
-        planner = PlannerAgent()
-        github = GitHubTool()
+        repository = Repository(
+            url="https://github.com/psf/requests",
+            owner="psf",
+            name="requests",
+        )
 
-        plan = planner.create_plan(repository)
+        planner = PlanningAgent(FakeLLM())
 
-        print("Execution Plan:")
+        plan = planner.create_plan(goal)
 
-        for step in plan:
-            print(f" - {step}")
+        print(plan)
 
-        github.fetch_metadata(repository)
+        github_tool = GitHubTool(GitHubClient())
+
+        repository = github_tool.enrich(repository)
+
+        print(repository)
