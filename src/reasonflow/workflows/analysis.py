@@ -8,6 +8,7 @@ from reasonflow.services.llm.fake import FakeLLM
 from reasonflow.tools.dependency import DependencyTool
 from reasonflow.tools.github import GitHubTool
 from reasonflow.tools.registry import ToolRegistry
+from reasonflow.tools.vulnerability import VulnerabilityTool
 
 
 class RepositoryAnalysisWorkflow:
@@ -47,6 +48,11 @@ class RepositoryAnalysisWorkflow:
         registry.register(
             "dependency",
             DependencyTool(),
+        )
+
+        registry.register(
+            "vulnerability",
+            VulnerabilityTool(),
         )
 
         executor = Executor(registry)
