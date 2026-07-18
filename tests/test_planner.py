@@ -13,8 +13,14 @@ def test_planning_agent():
 
     plan = planner.create_plan(goal)
 
-    assert len(plan.steps) == 4
-    assert plan.steps[0].description == "Analyze repository"
+    assert len(plan.steps) == 1
+
+    step = plan.steps[0]
+
+    assert step.description == "Fetch repository metadata"
+    assert step.tool_call is not None
+    assert step.tool_call.tool == "github"
+    assert step.tool_call.action == "metadata"
 
 
 def test_fetch_repository():

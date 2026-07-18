@@ -12,4 +12,4 @@ def test_analyze_command():
     )
 
     assert result.exit_code == 0
-    assert "Analyzing repository" in result.stdout
+    assert "Repository Information" in result.stdout
