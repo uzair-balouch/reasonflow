@@ -4,7 +4,7 @@ from reasonflow.models.goal import Goal
 from reasonflow.models.memory import Memory
 from reasonflow.models.repository import Repository
 from reasonflow.services.github import GitHubClient
-from reasonflow.services.llm.fake import FakeLLM
+from reasonflow.services.llm.gemini import GeminiLLM
 from reasonflow.tools.dependency import DependencyTool
 from reasonflow.tools.github import GitHubTool
 from reasonflow.tools.registry import ToolRegistry
@@ -27,16 +27,7 @@ class RepositoryAnalysisWorkflow:
 
         memory = Memory()
 
-        planner = PlanningAgent(FakeLLM())
-        plan = planner.create_plan(
-            goal,
-            memory,
-        )
-
-        print("\nPlanning...\n")
-
-        for step in plan.steps:
-            print(f"✓ {step.description}")
+        planner = PlanningAgent(GeminiLLM())
 
         registry = ToolRegistry()
 
@@ -57,16 +48,25 @@ class RepositoryAnalysisWorkflow:
 
         executor = Executor(registry)
 
-        repository = executor.execute(
-            plan,
-            repository,
-            memory,
-        )
+        while True:
+            plan = planner.create_plan(
+                goal,
+                memory,
+            )
 
-        next_plan = planner.create_plan(
-            goal,
-            memory,
-        )
+            if not plan.steps:
+                break
+
+            print("\nPlanning...\n")
+
+            for step in plan.steps:
+                print(f"✓ {step.description}")
+
+            repository = executor.execute(
+                plan,
+                repository,
+                memory,
+            )
 
         print("\nRepository Information")
         print("-" * 30)
@@ -85,10 +85,6 @@ class RepositoryAnalysisWorkflow:
 
         print("\nReflection")
         print("-" * 30)
-
-        if not next_plan.steps:
-            print("✓ Goal satisfied.")
-        else:
-            print("More work required.")
+        print("✓ Goal satisfied.")
 
         return repository

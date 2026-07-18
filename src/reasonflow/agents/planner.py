@@ -17,15 +17,75 @@ class PlanningAgent:
         memory: Memory,
     ) -> Plan:
 
-        prompt = f"""
-            Goal:
-            {goal.description}
+        observations = "\n".join(memory.observations)
 
-            Current Observations:
-            {chr(10).join(memory.observations)}
-        """
+        prompt = f"""
+    You are an autonomous software engineering agent.
+
+    Goal:
+    {goal.description}
+
+    Current observations:
+    {observations}
+
+    Available tools (USE THESE EXACT TOOL NAMES):
+
+    Tool: github
+    Allowed action:
+    - metadata
+
+    Tool: dependency
+    Allowed action:
+    - discover
+
+    Tool: vulnerability
+    Allowed action:
+    - scan
+
+    Rules:
+
+    1. The "tool" field MUST be exactly one of:
+    - github
+    - dependency
+    - vulnerability
+
+    2. The "action" field MUST be exactly one of:
+    - metadata
+    - discover
+    - scan
+
+    3. Never combine tool and action.
+    Correct:
+        "tool": "dependency"
+        "action": "discover"
+
+    Incorrect:
+        "tool": "dependency.discover"
+
+    4. Return ONLY valid JSON.
+
+    5. Do not use markdown.
+
+    6. If the goal is complete, return:
+
+    []
+
+    Example:
+
+    [
+        {{
+            "description": "Fetch repository metadata",
+            "tool": "github",
+            "action": "metadata"
+        }}
+    ]
+    """
 
         response = self.llm.generate(prompt)
+
+        print("\n========== LLM RESPONSE ==========\n")
+        print(response)
+        print("\n==================================\n")
 
         data = json.loads(response)
 
