@@ -1,9 +1,12 @@
+from reasonflow.agents.executor import Executor
 from reasonflow.agents.planner import PlanningAgent
 from reasonflow.models.goal import Goal
+from reasonflow.models.memory import Memory
 from reasonflow.models.repository import Repository
 from reasonflow.services.github import GitHubClient
 from reasonflow.services.llm.fake import FakeLLM
 from reasonflow.tools.github import GitHubTool
+from reasonflow.tools.registry import ToolRegistry
 
 
 class RepositoryAnalysisWorkflow:
@@ -20,19 +23,38 @@ class RepositoryAnalysisWorkflow:
             description="Analyze this repository",
         )
 
-        planner = PlanningAgent(FakeLLM())
-        plan = planner.create_plan(goal)
+        memory = Memory()
 
-        # print(plan)
+        planner = PlanningAgent(FakeLLM())
+        plan = planner.create_plan(
+            goal,
+            memory,
+        )
+
         print("\nPlanning...\n")
 
         for step in plan.steps:
             print(f"✓ {step.description}")
 
-        github_tool = GitHubTool(GitHubClient())
-        repository = github_tool.enrich(repository)
+        registry = ToolRegistry()
+        registry.register(
+            "github",
+            GitHubTool(GitHubClient()),
+        )
 
-        # print(repository)
+        executor = Executor(registry)
+
+        repository = executor.execute(
+            plan,
+            repository,
+            memory,
+        )
+
+        next_plan = planner.create_plan(
+            goal,
+            memory,
+        )
+
         print("\nRepository Information")
         print("-" * 30)
         print(f"Owner           : {repository.owner}")
@@ -41,5 +63,19 @@ class RepositoryAnalysisWorkflow:
         print(f"Default Branch  : {repository.default_branch}")
         print(f"License         : {repository.license}")
         print(f"Stars           : {repository.stars}")
+
+        print("\nObservations")
+        print("-" * 30)
+
+        for observation in memory.observations:
+            print(f"• {observation}")
+
+        print("\nReflection")
+        print("-" * 30)
+
+        if not next_plan.steps:
+            print("✓ Goal satisfied.")
+        else:
+            print("More work required.")
 
         return repository
