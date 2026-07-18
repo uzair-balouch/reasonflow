@@ -19,7 +19,8 @@ class Executor:
             if step.tool_call is None:
                 continue
 
-            tool = self.registry.get(step.tool_call.tool)
+            tool_name = step.tool_call.tool.split(".")[0]
+            tool = self.registry.get(tool_name)
 
             if step.tool_call.action == "metadata":
                 repository = tool.enrich(repository)
