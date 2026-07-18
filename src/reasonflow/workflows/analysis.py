@@ -5,6 +5,7 @@ from reasonflow.models.memory import Memory
 from reasonflow.models.repository import Repository
 from reasonflow.services.github import GitHubClient
 from reasonflow.services.llm.fake import FakeLLM
+from reasonflow.tools.dependency import DependencyTool
 from reasonflow.tools.github import GitHubTool
 from reasonflow.tools.registry import ToolRegistry
 
@@ -37,9 +38,15 @@ class RepositoryAnalysisWorkflow:
             print(f"✓ {step.description}")
 
         registry = ToolRegistry()
+
         registry.register(
             "github",
             GitHubTool(GitHubClient()),
+        )
+
+        registry.register(
+            "dependency",
+            DependencyTool(),
         )
 
         executor = Executor(registry)

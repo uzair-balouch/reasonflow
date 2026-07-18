@@ -28,4 +28,14 @@ class Executor:
                     f"Repository metadata collected for {repository.owner}/{repository.name}"
                 )
 
+            elif step.tool_call.action == "discover":
+                manifests = tool.find_manifests(repository)
+
+                if manifests:
+                    for manifest in manifests:
+                        memory.add(f"Found manifest: {manifest}")
+
+                else:
+                    memory.add("No dependency manifests found.")
+
         return repository

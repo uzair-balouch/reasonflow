@@ -10,11 +10,16 @@ class FakeLLM(BaseLLM):
 """
 
         return """
-[
-    {
-        "description": "Fetch repository metadata",
-        "tool": "github",
-        "action": "metadata"
-    }
-]
-"""
+            [
+                {
+                    "description": "Fetch repository metadata",
+                    "tool": "github",
+                    "action": "metadata"
+                },
+                {
+                    "description": "Discover dependency manifests",
+                    "tool": "dependency",
+                    "action": "discover"
+                }
+            ]
+        """
