@@ -1,5 +1,6 @@
 from reasonflow.agents.executor import Executor
 from reasonflow.agents.planner import PlanningAgent
+from reasonflow.agents.reporter import ReportingAgent
 from reasonflow.models.goal import Goal
 from reasonflow.models.memory import Memory
 from reasonflow.models.repository import Repository
@@ -27,7 +28,10 @@ class RepositoryAnalysisWorkflow:
 
         memory = Memory()
 
-        planner = PlanningAgent(GeminiLLM())
+        llm = GeminiLLM()
+
+        planner = PlanningAgent(llm)
+        reporter = ReportingAgent(llm)
 
         registry = ToolRegistry()
 
@@ -68,23 +72,15 @@ class RepositoryAnalysisWorkflow:
                 memory,
             )
 
-        print("\nRepository Information")
-        print("-" * 30)
-        print(f"Owner           : {repository.owner}")
-        print(f"Repository      : {repository.name}")
-        print(f"Language        : {repository.language}")
-        print(f"Default Branch  : {repository.default_branch}")
-        print(f"License         : {repository.license}")
-        print(f"Stars           : {repository.stars}")
+        report = reporter.generate_report(
+            goal,
+            repository,
+            memory,
+        )
 
-        print("\nObservations")
-        print("-" * 30)
-
-        for observation in memory.observations:
-            print(f"• {observation}")
-
-        print("\nReflection")
-        print("-" * 30)
-        print("✓ Goal satisfied.")
+        print("\n")
+        print("=" * 80)
+        print(report)
+        print("=" * 80)
 
         return repository

@@ -82,11 +82,6 @@ class PlanningAgent:
     """
 
         response = self.llm.generate(prompt)
-
-        print("\n========== LLM RESPONSE ==========\n")
-        print(response)
-        print("\n==================================\n")
-
         data = json.loads(response)
 
         steps = []
