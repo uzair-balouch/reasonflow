@@ -1,3 +1,4 @@
+from reasonflow.models.memory import Memory
 from reasonflow.models.plan import Plan
 from reasonflow.models.repository import Repository
 from reasonflow.tools.registry import ToolRegistry
@@ -11,6 +12,7 @@ class Executor:
         self,
         plan: Plan,
         repository: Repository,
+        memory: Memory,
     ) -> Repository:
 
         for step in plan.steps:
@@ -21,5 +23,9 @@ class Executor:
 
             if step.tool_call.action == "metadata":
                 repository = tool.enrich(repository)
+
+                memory.add(
+                    f"Repository metadata collected for {repository.owner}/{repository.name}"
+                )
 
         return repository
