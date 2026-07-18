@@ -46,4 +46,16 @@ class Executor:
                     for dependency in dependencies:
                         memory.add(f"Dependency: {dependency}")
 
+            elif step.tool_call.action == "scan":
+                dependencies = []
+
+                for observation in memory.observations:
+                    if observation.startswith("Dependency: "):
+                        dependencies.append(observation.replace("Dependency: ", ""))
+
+                findings = tool.scan(dependencies)
+
+                for finding in findings:
+                    memory.add(finding)
+
         return repository

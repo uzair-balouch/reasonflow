@@ -12,7 +12,7 @@ def test_planning_agent():
 
     plan = planner.create_plan(goal, memory)
 
-    assert len(plan.steps) == 2
+    assert len(plan.steps) == 3
 
     assert plan.steps[0].description == "Fetch repository metadata"
     assert plan.steps[0].tool_call.tool == "github"
@@ -21,6 +21,10 @@ def test_planning_agent():
     assert plan.steps[1].description == "Discover dependency manifests"
     assert plan.steps[1].tool_call.tool == "dependency"
     assert plan.steps[1].tool_call.action == "discover"
+
+    assert plan.steps[2].description == "Scan dependencies for vulnerabilities"
+    assert plan.steps[2].tool_call.tool == "vulnerability"
+    assert plan.steps[2].tool_call.action == "scan"
 
 
 def test_planning_agent_after_metadata():

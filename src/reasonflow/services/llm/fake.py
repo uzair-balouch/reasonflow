@@ -20,6 +20,11 @@ class FakeLLM(BaseLLM):
                     "description": "Discover dependency manifests",
                     "tool": "dependency",
                     "action": "discover"
+                },
+                {
+                    "description": "Scan dependencies for vulnerabilities",
+                    "tool": "vulnerability",
+                    "action": "scan"
                 }
             ]
         """
