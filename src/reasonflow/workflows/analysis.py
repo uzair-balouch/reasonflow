@@ -26,7 +26,10 @@ class RepositoryAnalysisWorkflow:
         memory = Memory()
 
         planner = PlanningAgent(FakeLLM())
-        plan = planner.create_plan(goal)
+        plan = planner.create_plan(
+            goal,
+            memory,
+        )
 
         print("\nPlanning...\n")
 
@@ -47,6 +50,11 @@ class RepositoryAnalysisWorkflow:
             memory,
         )
 
+        next_plan = planner.create_plan(
+            goal,
+            memory,
+        )
+
         print("\nRepository Information")
         print("-" * 30)
         print(f"Owner           : {repository.owner}")
@@ -61,5 +69,13 @@ class RepositoryAnalysisWorkflow:
 
         for observation in memory.observations:
             print(f"• {observation}")
+
+        print("\nReflection")
+        print("-" * 30)
+
+        if not next_plan.steps:
+            print("✓ Goal satisfied.")
+        else:
+            print("More work required.")
 
         return repository
