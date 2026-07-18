@@ -7,29 +7,39 @@ from reasonflow.tools.github import GitHubTool
 
 
 class RepositoryAnalysisWorkflow:
-    def run(
-        self,
-        goal: Goal,
-        repository: Repository,
-    ) -> Repository:
+    def run(self, repository_url: str) -> Repository:
+        parts = repository_url.rstrip("/").split("/")
+
+        repository = Repository(
+            url=repository_url,
+            owner=parts[-2],
+            name=parts[-1],
+        )
+
         goal = Goal(
             description="Analyze this repository",
         )
 
-        repository = Repository(
-            url="https://github.com/psf/requests",
-            owner="psf",
-            name="requests",
-        )
-
         planner = PlanningAgent(FakeLLM())
-
         plan = planner.create_plan(goal)
 
-        print(plan)
+        # print(plan)
+        print("\nPlanning...\n")
+
+        for step in plan.steps:
+            print(f"✓ {step.description}")
 
         github_tool = GitHubTool(GitHubClient())
-
         repository = github_tool.enrich(repository)
 
-        print(repository)
+        # print(repository)
+        print("\nRepository Information")
+        print("-" * 30)
+        print(f"Owner           : {repository.owner}")
+        print(f"Repository      : {repository.name}")
+        print(f"Language        : {repository.language}")
+        print(f"Default Branch  : {repository.default_branch}")
+        print(f"License         : {repository.license}")
+        print(f"Stars           : {repository.stars}")
+
+        return repository

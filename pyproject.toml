@@ -67,3 +67,7 @@ source = ["src"]
 [tool.coverage.report]
 show_missing = true
 skip_empty = true
+
+
+[project.scripts]
+reasonflow = "reasonflow.cli.main:app"
